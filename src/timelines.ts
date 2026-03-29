@@ -44,7 +44,7 @@ export const timeline: TimelineItem[] = [
     text: '在天津大学算法社参与将 HOJ 修改为 TJUOJ 的工作，负责前端开发。',
     tags: ['tju', 'algorithm-club', 'frontend', 'oj'],
     kind: 'career',
-    branches: ['education', 'frontend'],
+    branches: ['education'],
   },
   {
     date: {
@@ -56,7 +56,6 @@ export const timeline: TimelineItem[] = [
     tags: ['c++11', 'typescript', 'rust', 'snake-game'],
     kind: 'demo',
     url: 'https://gitee.com/jabberwocky238/collections/496642',
-    branches: ['language-exploration', 'game-demo'],
   },
   {
     date: {
@@ -67,7 +66,6 @@ export const timeline: TimelineItem[] = [
     text: '使用 TypeScript 完成前后端开发，做了一个在线课程平台，包含上传、观看、权限管理以及 HLS 流媒体加密等能力。',
     tags: ['typescript', 'frontend', 'backend', 'hls', 'streaming'],
     kind: 'project',
-    branches: ['product-engineering', 'media-platform'],
   },
   {
     date: [2024, 9, 21],
@@ -84,7 +82,6 @@ export const timeline: TimelineItem[] = [
     tags: ['c++11', 'filesystem', 'csv', 'disk-usage'],
     kind: 'demo',
     status: 'archive',
-    branches: ['storage-exploration'],
   },
   {
     date: [2024, 10, 8],
@@ -93,7 +90,6 @@ export const timeline: TimelineItem[] = [
     tags: ['rust', 'filesystem', 'csv', 'disk-usage'],
     kind: 'demo',
     status: 'archive',
-    branches: ['storage-exploration'],
   },
   {
     date: [2024, 10, 16],
@@ -101,7 +97,6 @@ export const timeline: TimelineItem[] = [
     text: '实现微信公众号聊天机器人、动态回复和文件 feeding 流程，技术栈使用 Hypercorn + FastAPI。',
     tags: ['wechat', 'bot', 'fastapi', 'hypercorn', 'feeding'],
     kind: 'project',
-    branches: ['agent-systems', 'backend'],
   },
   {
     date: [2024, 11, 13],
@@ -109,7 +104,6 @@ export const timeline: TimelineItem[] = [
     text: '开发了一个基于 PWA 的音乐平台，支持多端同步、自定义后端认证以及自部署后端。',
     tags: ['pwa', 'music', 'sync', 'authentication', 'self-hosting'],
     kind: 'project',
-    branches: ['product-engineering', 'media-platform'],
   },
   {
     date: [2024, 11, 20],
@@ -118,7 +112,6 @@ export const timeline: TimelineItem[] = [
     tags: ['python', 'tch-rs', 'transformers', 'llama'],
     kind: 'demo',
     status: 'archive',
-    branches: ['llm-systems'],
   },
   {
     date: [2024, 12, 6],
@@ -128,7 +121,6 @@ export const timeline: TimelineItem[] = [
     kind: 'solution',
     status: 'active',
     url: 'https://github.com/Jabberwocky238/jw-micromark-toolbox',
-    branches: ['markdown-tooling'],
   },
   {
     date: [2025, 1, 3],
@@ -147,7 +139,6 @@ export const timeline: TimelineItem[] = [
     kind: 'project',
     status: 'archive',
     url: 'https://github.com/Jabberwocky238/environmentor',
-    branches: ['desktop-apps'],
   },
   {
     date: [2025, 2, 23],
@@ -156,7 +147,6 @@ export const timeline: TimelineItem[] = [
     tags: ['reverse-engineering', 'netease-cloud-music', 'nocobase', 'admin'],
     kind: 'project',
     url: 'https://gitee.com/jabberwocky238/11112222',
-    branches: ['backend', 'reverse-engineering'],
   },
   {
     date: [2025, 3, 12],
@@ -172,7 +162,7 @@ export const timeline: TimelineItem[] = [
     text: '参与学生发起的小程序开发项目 Infinite Galaxy，负责前端、后端以及数据库管理工作。',
     tags: ['mini-program', 'frontend', 'backend', 'database', 'teamwork'],
     kind: 'project',
-    branches: ['frontend', 'backend'],
+    branches: ['education'],
   },
   {
     date: {
@@ -184,7 +174,6 @@ export const timeline: TimelineItem[] = [
     tags: ['flclash', 'authentication', 'config', 'network', 'customization'],
     kind: 'project',
     status: 'archive',
-    branches: ['proxy-stack'],
   },
   {
     date: [2025, 6, 11],
@@ -201,7 +190,6 @@ export const timeline: TimelineItem[] = [
     tags: ['coze', 'agent', 'chat', 'product'],
     kind: 'product',
     status: 'archive',
-    branches: ['agent-systems', 'product-engineering'],
   },
   {
     date: [2025, 7, 25],
@@ -211,7 +199,7 @@ export const timeline: TimelineItem[] = [
     kind: 'project',
     status: 'active',
     url: 'https://github.com/Jabberwocky238/gasoline',
-    branches: ['network-stack', 'anti-censorship'],
+    branches: ['network-stack'],
   },
   {
     date: [2025, 8, 1],
@@ -219,7 +207,7 @@ export const timeline: TimelineItem[] = [
     text: '创立 enzyme.cloud，提供 SOCKS5 VPN 代理服务。',
     tags: ['socks5', 'vpn', 'proxy', 'service'],
     kind: 'product',
-    branches: ['network-stack', 'product-engineering'],
+    branches: ['network-stack', 'entrepreneurship'],
   },
   {
     date: [2025, 9, 11],
@@ -229,7 +217,6 @@ export const timeline: TimelineItem[] = [
     kind: 'project',
     status: 'archive',
     url: 'https://github.com/Jabberwocky238/rfc-archive',
-    branches: ['network-stack', 'writing'],
   },
   {
     date: [2025, 9, 15],
@@ -237,7 +224,7 @@ export const timeline: TimelineItem[] = [
     text: '加入纽约学生创业组织 K&M ERA，担任 CTO，负责 Solana 合约开发。',
     tags: ['cto', 'solana', 'smart-contract', 'startup', 'nyc'],
     kind: 'career',
-    branches: ['web3', 'leadership'],
+    branches: ['web3', 'entrepreneurship'],
   },
   {
     date: [2025, 9, 17],
@@ -245,7 +232,6 @@ export const timeline: TimelineItem[] = [
     text: '开启 ratemygirls 项目：使用 Bilibili 机器人账号，自动根据 @ 和回复内容抓取笔记图片并上传到 R2 存储桶，同时分析文字部分携带的 tag，对图片进行自动分类。',
     tags: ['bilibili', 'bot', 'r2', 'image', 'classification'],
     kind: 'project',
-    branches: ['agent-systems', 'media-pipeline'],
   },
   {
     date: {
@@ -257,7 +243,7 @@ export const timeline: TimelineItem[] = [
     tags: ['wireguard', 'source-code', 'network', 'zhihu', 'writing'],
     kind: 'solution',
     url: 'https://www.zhihu.com/column/c_1970274841656525692',
-    branches: ['network-stack', 'writing'],
+    branches: ['network-stack'],
   },
   {
     date: [2025, 11, 27],
@@ -274,7 +260,7 @@ export const timeline: TimelineItem[] = [
     text: '对 trojan-go 进行二次开发，使其支持通过 HTTP 验证，并与 hysteria2 server 保持同一套接口设计。',
     tags: ['trojan-go', 'http', 'authentication', 'hysteria2', 'network'],
     kind: 'solution',
-    branches: ['network-stack', 'anti-censorship'],
+    branches: ['network-stack'],
   },
   {
     date: [2026, 1, 2],
@@ -321,7 +307,7 @@ export const timeline: TimelineItem[] = [
     tags: ['go', 'sqlparser', 'sqlite', 'postgresql', 'parser'],
     kind: 'solution',
     url: 'https://github.com/Jabberwocky238/sqlparser',
-    branches: ['database-systems'],
+    branches: ['combinator'],
   },
   {
     date: [2026, 2, 11],
@@ -338,7 +324,7 @@ export const timeline: TimelineItem[] = [
     text: '阅读 Traefik 源码后，确认 Kubernetes 和 DevOps 是更值得投入的方向，开始系统学习 Kubernetes，并决定彻底终止 combinator 计划。',
     tags: ['traefik', 'kubernetes', 'devops', 'source-code', 'architecture'],
     kind: 'career',
-    branches: ['cloud-native', 'combinator'],
+    branches: ['cloud-native'],
   },
   {
     date: [2026, 2, 13],
@@ -347,7 +333,7 @@ export const timeline: TimelineItem[] = [
     tags: ['kubernetes', 'dns', 'geoip', 'mmdb', 'forwarding'],
     kind: 'solution',
     url: 'https://github.com/Jabberwocky238/luna-dns',
-    branches: ['cloud-native', 'luna'],
+    branches: ['cloud-native'],
   },
   {
     date: [2026, 2, 19],
@@ -355,7 +341,7 @@ export const timeline: TimelineItem[] = [
     text: '开启 durableobject 项目，目标是复刻 Cloudflare Worker 的底层架构，并同时开始深度研究 workerd 与 cloudflared 源码。',
     tags: ['cloudflare-workers', 'workerd', 'cloudflared', 'runtime', 'source-code'],
     kind: 'trial',
-    branches: ['cloud-native', 'runtime-research'],
+    branches: ['cloud-native', 'edge-computing'],
   },
   {
     date: {
@@ -368,7 +354,7 @@ export const timeline: TimelineItem[] = [
     kind: 'trial',
     status: 'archive',
     url: 'https://github.com/Jabberwocky238/fs3',
-    branches: ['storage-systems', 'ai-agent-research'],
+    branches: ['cloud-native', 'agent-programming'],
   },
   {
     date: [2026, 3, 21],
@@ -377,7 +363,7 @@ export const timeline: TimelineItem[] = [
     tags: ['luna-edge', 'quicksilver', 'config-distribution', 'cloudflare', 'infrastructure'],
     kind: 'trial',
     status: 'archive',
-    branches: ['luna', 'cloud-native'],
+    branches: ['cloud-native'],
   },
   {
     date: [2026, 3, 23],
@@ -386,7 +372,7 @@ export const timeline: TimelineItem[] = [
     tags: ['venus-edge', 'infra', 'architecture', 'refactor', 'codex'],
     kind: 'solution',
     status: 'active',
-    branches: ['luna', 'cloud-native'],
+    branches: ['cloud-native', 'agent-programming'],
   },
   {
     date: [2026, 3, 29],
@@ -395,6 +381,5 @@ export const timeline: TimelineItem[] = [
     tags: ['homepage', 'launch', 'identity'],
     kind: 'project',
     status: 'active',
-    branches: ['personal-brand'],
   },
 ]
