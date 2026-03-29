@@ -1,13 +1,20 @@
 import type { ReactNode } from 'react'
 import { HashRouter, Route, Routes } from 'react-router-dom'
 import { getTagMeta } from './tagicon'
-import { timeline, type TimelineDate, type TimelinePoint } from './timelines'
+import { timeline, type TimelineDate, type TimelineItem, type TimelinePoint } from './timelines'
 
 type LinkItem = {
   label: string
   href: string
   value: string
   icon: ReactNode
+}
+
+type GraphBranch = {
+  id: string
+  label: string
+  color: string
+  match: (item: TimelineItem) => boolean
 }
 
 const links: LinkItem[] = [
@@ -57,6 +64,36 @@ const links: LinkItem[] = [
   },
 ]
 
+const graphBranches: GraphBranch[] = [
+  {
+    id: 'tju',
+    label: 'TJU',
+    color: '#2563eb',
+    match: (item) => item.tags.includes('tju'),
+  },
+  {
+    id: 'nyu',
+    label: 'NYU',
+    color: '#7c3aed',
+    match: (item) => item.tags.includes('nyu'),
+  },
+  {
+    id: 'kmera',
+    label: 'K&M ERA',
+    color: '#db2777',
+    match: (item) => item.title.includes('K&M ERA'),
+  },
+  {
+    id: 'combinator',
+    label: 'Combinator',
+    color: '#0ea5e9',
+    match: (item) =>
+      item.title.toLowerCase().includes('combinator') ||
+      item.text.toLowerCase().includes('combinator') ||
+      item.tags.includes('combinator'),
+  },
+]
+
 function formatPoint([year, month, day]: TimelinePoint) {
   return `${year} / ${String(month).padStart(2, '0')} / ${String(day).padStart(2, '0')}`
 }
@@ -89,28 +126,65 @@ function HomePage() {
     (a, b) => getTimelineSortValue(b.date) - getTimelineSortValue(a.date)
   )
 
+  const branchMembership = timelineItems.map((item) =>
+    graphBranches.filter((branch) => branch.match(item))
+  )
+
+  const branchExtents = new Map<string, { first: number; last: number }>()
+  branchMembership.forEach((branches, index) => {
+    branches.forEach((branch) => {
+      const current = branchExtents.get(branch.id)
+      if (!current) {
+        branchExtents.set(branch.id, { first: index, last: index })
+      } else {
+        current.first = Math.min(current.first, index)
+        current.last = Math.max(current.last, index)
+      }
+    })
+  })
+
+  const railLeft = 14
+  const branchOffsets = graphBranches.reduce<Record<string, number>>((acc, branch, index) => {
+    acc[branch.id] = 48 + index * 20
+    return acc
+  }, {})
+  const graphWidth = 140
+
   return (
     <main className="mx-auto min-h-screen w-full max-w-6xl px-4 py-4 sm:px-6 sm:py-8">
       <div className="grid gap-5">
         <section className="relative overflow-hidden rounded-[2rem] border border-stone-800/10 bg-[linear-gradient(180deg,rgba(255,250,245,0.96),rgba(255,255,255,0.92))] p-6 shadow-[0_24px_60px_rgba(81,52,35,0.08),0_8px_20px_rgba(81,52,35,0.06)] sm:p-10">
           <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-orange-500/10 blur-3xl" />
-          <p className="mb-4 font-mono text-sm uppercase tracking-[0.32em] text-orange-700">Jabberwocky238</p>
+          <p className="mb-4 font-mono text-sm uppercase tracking-[0.32em] text-orange-700">
+            Jabberwocky238
+          </p>
 
           <div className="mt-10 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
             <article className="rounded-[1.5rem] border border-stone-800/10 bg-white/75 p-6 backdrop-blur">
-              <span className="inline-block font-mono text-xs uppercase tracking-[0.28em] text-stone-500">About</span>
-              <h2 className="mt-4 font-serif text-3xl font-semibold tracking-[-0.04em] text-stone-900">个人介绍</h2>
+              <span className="inline-block font-mono text-xs uppercase tracking-[0.28em] text-stone-500">
+                About
+              </span>
+              <h2 className="mt-4 font-serif text-3xl font-semibold tracking-[-0.04em] text-stone-900">
+                个人介绍
+              </h2>
               <p className="mt-4 text-stone-600">
-                我关注代码、产品和互联网上那些有意思的小东西。这个站点会用最直接的方式介绍我是谁，以及我在做什么。
+                我关注代码、产品、基础设施和互联网上那些有意思的小东西。这个站点会用最直接的方式介绍我是谁，以及我在做什么。
               </p>
             </article>
 
             <article className="rounded-[1.5rem] border border-stone-800/10 bg-[linear-gradient(135deg,rgba(210,92,52,0.12),rgba(255,255,255,0.85))] p-6">
-              <span className="inline-block font-mono text-xs uppercase tracking-[0.28em] text-stone-500">Contact</span>
-              <h2 className="mt-4 font-serif text-3xl font-semibold tracking-[-0.04em] text-stone-900">联系我</h2>
+              <span className="inline-block font-mono text-xs uppercase tracking-[0.28em] text-stone-500">
+                Contact
+              </span>
+              <h2 className="mt-4 font-serif text-3xl font-semibold tracking-[-0.04em] text-stone-900">
+                联系我
+              </h2>
               <ul className="mt-6 grid gap-4">
                 {links.map((link) => (
-                  <li key={link.label} className="border-b border-stone-900/10 pb-4 last:border-b-0 last:pb-0">
+                  <li
+                    key={link.label}
+                    className="border-b border-stone-900/10 pb-4 last:border-b-0 last:pb-0"
+                  >
                     <span className="block text-sm text-stone-500">{link.label}</span>
                     <a
                       className="mt-1 inline-flex items-center gap-2 break-all text-stone-900 transition hover:text-orange-700"
@@ -130,47 +204,176 @@ function HomePage() {
 
         <section className="rounded-[2rem] border border-stone-800/10 bg-white/70 p-6 shadow-[0_24px_60px_rgba(81,52,35,0.08),0_8px_20px_rgba(81,52,35,0.06)] backdrop-blur sm:p-8">
           <div className="mb-8">
-            <p className="mb-3 font-mono text-sm uppercase tracking-[0.32em] text-orange-700">Timeline</p>
+            <p className="mb-3 font-mono text-sm uppercase tracking-[0.32em] text-orange-700">
+              Timeline
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <span className="inline-flex items-center gap-2 rounded-full bg-stone-100 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-stone-700">
+                <span className="h-2 w-2 rounded-full bg-orange-600" />
+                Main
+              </span>
+              {graphBranches.map((branch) => (
+                <span
+                  key={branch.id}
+                  className="inline-flex items-center gap-2 rounded-full bg-stone-100 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-stone-700"
+                >
+                  <span
+                    className="h-2 w-2 rounded-full"
+                    style={{ backgroundColor: branch.color }}
+                  />
+                  {branch.label}
+                </span>
+              ))}
+            </div>
           </div>
 
-          <div className="relative grid gap-6 pl-5 before:absolute before:bottom-1 before:left-[0.33rem] before:top-1 before:w-0.5 before:bg-[linear-gradient(180deg,#d25c34,rgba(210,92,52,0.12))] before:content-['']">
-            {timelineItems.map((item) => (
-              <article className="relative" key={`${getTimelineKey(item.date)}-${item.title}`}>
-                <div className="absolute -left-5 top-2 h-3.5 w-3.5 rounded-full bg-orange-600 shadow-[0_0_0_6px_rgba(210,92,52,0.12)]" />
-                <div className="rounded-[1.25rem] border border-stone-900/10 bg-white/80 p-5">
-                  <p className="mb-2 font-mono text-xs uppercase tracking-[0.28em] text-stone-500">{formatTimelineDate(item.date)}</p>
-                  <div className="mb-3 flex flex-wrap gap-2">
-                    <span className="rounded-full bg-orange-100 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-orange-700">
-                      {item.kind}
-                    </span>
-                    {item.status ? (
-                      <span className="rounded-full bg-stone-100 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-stone-600">
-                        {item.status}
-                      </span>
-                    ) : null}
-                  </div>
-                  <h3 className="text-xl font-semibold text-stone-900">{item.title}</h3>
-                  <p className="mt-2 text-stone-600">{item.text}</p>
-                  <ul className="mt-4 flex flex-wrap gap-2">
-                    {item.tags.map((tag) => {
-                      const meta = getTagMeta(tag)
+          <div className="relative grid gap-6" style={{ paddingLeft: `${graphWidth}px` }}>
+            <div className="pointer-events-none absolute bottom-1 top-1" style={{ left: 0, width: `${graphWidth}px` }}>
+              <div
+                className="absolute bottom-0 top-0 w-[2px] rounded-full bg-orange-600/80"
+                style={{ left: `${railLeft}px` }}
+              />
+              {graphBranches.map((branch) => {
+                const extent = branchExtents.get(branch.id)
+                if (!extent) return null
 
-                      return (
-                        <li
-                          className="inline-flex items-center gap-2 rounded-full border border-stone-900/10 px-3 py-1 text-sm text-stone-700"
-                          key={tag}
+                return (
+                  <div
+                    key={branch.id}
+                    className="absolute w-[2px] rounded-full"
+                    style={{
+                      left: `${branchOffsets[branch.id]}px`,
+                      top: `${extent.first * 274 + 22}px`,
+                      bottom: `${Math.max((timelineItems.length - extent.last - 1) * 274 + 22, 0)}px`,
+                      backgroundColor: branch.color,
+                    }}
+                  />
+                )
+              })}
+            </div>
+
+            {timelineItems.map((item, index) => {
+              const activeBranches = branchMembership[index]
+              const primaryBranch = activeBranches[0]
+              const lineEnd = primaryBranch ? branchOffsets[primaryBranch.id] : railLeft
+              const isBranchStart = primaryBranch
+                ? branchExtents.get(primaryBranch.id)?.last === index
+                : false
+              const isBranchEnd = primaryBranch
+                ? branchExtents.get(primaryBranch.id)?.first === index
+                : false
+
+              return (
+                <article className="relative" key={`${getTimelineKey(item.date)}-${item.title}`}>
+                  <div
+                    className="absolute top-5 h-[2px] bg-stone-300/80"
+                    style={{
+                      left: `${-graphWidth + railLeft}px`,
+                      width: `${lineEnd - railLeft}px`,
+                    }}
+                  />
+
+                  <div
+                    className="absolute top-[15px] h-3.5 w-3.5 rounded-full bg-orange-600 shadow-[0_0_0_6px_rgba(210,92,52,0.12)]"
+                    style={{ left: `${-graphWidth + railLeft - 6}px` }}
+                  />
+
+                  {activeBranches.map((branch) => (
+                    <div
+                      key={branch.id}
+                      className="absolute top-[15px] h-3.5 w-3.5 rounded-full border-2 border-white shadow-sm"
+                      style={{
+                        left: `${-graphWidth + branchOffsets[branch.id] - 6}px`,
+                        backgroundColor: branch.color,
+                      }}
+                      title={branch.label}
+                    />
+                  ))}
+
+                  {isBranchStart && primaryBranch ? (
+                    <div
+                      className="absolute top-[12px] h-5 w-5 rounded-full border-2 border-white"
+                      style={{
+                        left: `${-graphWidth + branchOffsets[primaryBranch.id] - 9}px`,
+                        backgroundColor: primaryBranch.color,
+                        boxShadow: `0 0 0 4px ${primaryBranch.color}22`,
+                      }}
+                      title={`${primaryBranch.label} start`}
+                    />
+                  ) : null}
+
+                  {isBranchEnd && primaryBranch ? (
+                    <div
+                      className="absolute top-[17px] h-2.5 w-2.5 rotate-45 border-2 border-white"
+                      style={{
+                        left: `${-graphWidth + branchOffsets[primaryBranch.id] - 5}px`,
+                        backgroundColor: primaryBranch.color,
+                      }}
+                      title={`${primaryBranch.label} end`}
+                    />
+                  ) : null}
+
+                  <div className="rounded-[1.25rem] border border-stone-900/10 bg-white/80 p-5">
+                    <p className="mb-2 font-mono text-xs uppercase tracking-[0.28em] text-stone-500">
+                      {formatTimelineDate(item.date)}
+                    </p>
+                    <div className="mb-3 flex flex-wrap gap-2">
+                      <span className="rounded-full bg-orange-100 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-orange-700">
+                        {item.kind}
+                      </span>
+                      {item.status ? (
+                        <span className="rounded-full bg-stone-100 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-stone-600">
+                          {item.status}
+                        </span>
+                      ) : null}
+                      {activeBranches.map((branch) => (
+                        <span
+                          key={branch.id}
+                          className="inline-flex items-center gap-2 rounded-full bg-stone-100 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-stone-600"
                         >
-                          <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-stone-900/5 text-stone-700">
-                            {meta.icon}
-                          </span>
-                          <span>{meta.label}</span>
-                        </li>
-                      )
-                    })}
-                  </ul>
-                </div>
-              </article>
-            ))}
+                          <span
+                            className="h-2 w-2 rounded-full"
+                            style={{ backgroundColor: branch.color }}
+                          />
+                          {branch.label}
+                        </span>
+                      ))}
+                    </div>
+                    <h3 className="text-xl font-semibold text-stone-900">{item.title}</h3>
+                    <p className="mt-2 text-stone-600">{item.text}</p>
+                    {item.url ? (
+                      <p className="mt-3">
+                        <a
+                          className="text-sm text-orange-700 underline decoration-orange-300 underline-offset-4 transition hover:text-orange-800"
+                          href={item.url}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Open Link
+                        </a>
+                      </p>
+                    ) : null}
+                    <ul className="mt-4 flex flex-wrap gap-2">
+                      {item.tags.map((tag) => {
+                        const meta = getTagMeta(tag)
+
+                        return (
+                          <li
+                            className="inline-flex items-center gap-2 rounded-full border border-stone-900/10 px-3 py-1 text-sm text-stone-700"
+                            key={tag}
+                          >
+                            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-stone-900/5 text-stone-700">
+                              {meta.icon}
+                            </span>
+                            <span>{meta.label}</span>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  </div>
+                </article>
+              )
+            })}
           </div>
         </section>
       </div>
