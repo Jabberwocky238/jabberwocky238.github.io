@@ -332,7 +332,6 @@ export const timeline: TimelineItem[] = [
         text: '阅读 Traefik 源码后，确认 Kubernetes 和 DevOps 是更值得投入的方向，开始系统学习 Kubernetes，并决定彻底终止 combinator 计划。',
         tags: ['traefik', 'kubernetes', 'devops', 'source-code', 'architecture'],
         kind: 'career',
-
     },
     {
         date: [2026, 2, 13],
@@ -349,14 +348,13 @@ export const timeline: TimelineItem[] = [
         text: '开启 durableobject 项目，目标是复刻 Cloudflare Worker 的底层架构，并同时开始深度研究 workerd 与 cloudflared 源码。',
         tags: ['cloudflare-workers', 'workerd', 'cloudflared', 'runtime', 'source-code'],
         kind: 'trial',
-        branches: ['cloud-native', 'edge-computing'],
     },
     {
         date: {
             start: [2026, 3, 11],
             end: [2026, 3, 14],
         },
-        title: 'fs3 短线项目',
+        title: 'fs3对象存储',
         text: '进行为期四天的短线项目 fs3，目标是从底层存储字节分布到 API 表现与性能都尽可能与 MinIO 完全一致，并探索 AI agent 编程极限。最终测试表明，即使有人类大量介入，Claude Opus 4.6 和 Codex 5.4 仍无法胜任该问题。',
         tags: ['rust', 'minio', 'ai-agent', 'experiment', 'storage'],
         kind: 'trial',
@@ -366,7 +364,7 @@ export const timeline: TimelineItem[] = [
     },
     {
         date: [2026, 3, 21],
-        title: '终止 luna-edge 项目',
+        title: '完成 luna-edge',
         text: '终止 luna-edge 项目。该项目尝试合并 luna-ingress 与 luna-dns，目标是复刻 Cloudflare Quicksilver 配置分发网络。',
         tags: ['luna-edge', 'quicksilver', 'config-distribution', 'cloudflare', 'infrastructure'],
         kind: 'trial',
@@ -374,12 +372,11 @@ export const timeline: TimelineItem[] = [
     },
     {
         date: [2026, 3, 23],
-        title: '完成 venus-edge',
+        title: '重构 luna-edge 为 venus-edge',
         text: '在 Codex 5.4 帮助下完成 venus-edge，充分使用 infra 思想，大幅降低系统复杂度并覆盖 luna-edge 的全部功能，代码量相比原方案降低约 95%。',
         tags: ['venus-edge', 'infra', 'architecture', 'refactor', 'codex'],
         kind: 'solution',
         status: 'active',
-        branches: ['cloud-native', 'agent-programming'],
     },
     {
         date: [2026, 3, 29],
