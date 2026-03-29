@@ -10,20 +10,20 @@ import {
 import '@xyflow/react/dist/style.css'
 import { HashRouter, Route, Routes } from 'react-router-dom'
 import { getTagMeta } from './tagicon'
-import { timeline, type TimelineDate, type TimelineItem, type TimelinePoint } from './timelines'
+import {
+  graphBranches,
+  timeline,
+  type GraphBranchId,
+  type TimelineDate,
+  type TimelineItem,
+  type TimelinePoint,
+} from './timelines'
 
 type LinkItem = {
   label: string
   href: string
   value: string
   icon: ReactNode
-}
-
-type GraphBranch = {
-  id: string
-  label: string
-  color: string
-  match: (item: TimelineItem) => boolean
 }
 
 const links: LinkItem[] = [
@@ -73,31 +73,15 @@ const links: LinkItem[] = [
   },
 ]
 
-const graphBranches: GraphBranch[] = [
-  {
-    id: 'tju',
-    label: 'TJU',
-    color: '#2563eb',
-    match: (item) => item.tags.includes('tju'),
-  },
-  {
-    id: 'nyu',
-    label: 'NYU',
-    color: '#7c3aed',
-    match: (item) => item.tags.includes('nyu'),
-  },
-  {
-    id: 'network-stack',
-    label: 'Net Stack',
-    color: '#0ea5e9',
-    match: (item) => item.branches?.includes('network-stack') ?? false,
-  },
-]
-
 const MAIN_X = 20
 const ROW_HEIGHT = 248
 const DOT_OFFSET_Y = 117
-const FLOW_WIDTH = 240
+const FLOW_WIDTH = 320
+
+const graphBranchEntries = Object.entries(graphBranches) as [
+  GraphBranchId,
+  (typeof graphBranches)[GraphBranchId],
+][]
 
 function formatPoint([year, month, day]: TimelinePoint) {
   return `${year} / ${String(month).padStart(2, '0')} / ${String(day).padStart(2, '0')}`
@@ -120,17 +104,15 @@ function getTimelineSortValue(date: TimelineDate) {
 
 function buildTimelineFlow(timelineItems: TimelineItem[]) {
   const branchMembership = timelineItems.map((item) =>
-    graphBranches.filter((branch) => branch.match(item))
+    (item.branches ?? []).map((branchId) => ({
+      id: branchId,
+      ...graphBranches[branchId],
+    }))
   )
-  const branchOffsets: Record<string, number> = {
-    tju: 50,
-    nyu: 80,
-    'network-stack': 110,
-  }
 
   const nodes: Node[] = []
   const edges: Edge[] = []
-  const previousBranchDots = new Map<string, string>()
+  const previousBranchDots = new Map<GraphBranchId, string>()
   let previousMainDot: string | null = null
 
   edges.push({
@@ -150,21 +132,15 @@ function buildTimelineFlow(timelineItems: TimelineItem[]) {
     data: {},
     style: { width: 1, height: 1, opacity: 0, pointerEvents: 'none' },
   })
-  nodes.push({
-    id: 'nyu-top-anchor',
-    position: { x: 48, y: 0 },
-    draggable: false,
-    selectable: false,
-    data: {},
-    style: { width: 1, height: 1, opacity: 0, pointerEvents: 'none' },
-  })
-  nodes.push({
-    id: 'network-top-anchor',
-    position: { x: 56, y: 0 },
-    draggable: false,
-    selectable: false,
-    data: {},
-    style: { width: 1, height: 1, opacity: 0, pointerEvents: 'none' },
+  graphBranchEntries.forEach(([branchId, branch]) => {
+    nodes.push({
+      id: `${branchId}-top-anchor`,
+      position: { x: branch.topAnchorX, y: 0 },
+      draggable: false,
+      selectable: false,
+      data: {},
+      style: { width: 1, height: 1, opacity: 0, pointerEvents: 'none' },
+    })
   })
 
   timelineItems.forEach((_, index) => {
@@ -206,7 +182,7 @@ function buildTimelineFlow(timelineItems: TimelineItem[]) {
 
     branches.forEach((branch, branchIndex) => {
       const branchDotId = `branch-${branch.id}-${index}`
-      const x = branchOffsets[branch.id]
+      const x = branch.offset
 
       nodes.push({
         id: branchDotId,
@@ -239,19 +215,10 @@ function buildTimelineFlow(timelineItems: TimelineItem[]) {
             height: 18,
           },
         })
-      } else if (branch.id === 'nyu') {
+      } else {
         edges.push({
-          id: 'branch-nyu-top-stem',
-          source: 'nyu-top-anchor',
-          target: branchDotId,
-          type: 'straight',
-          animated: false,
-          style: { stroke: branch.color, strokeWidth: 3 },
-        })
-      } else if (branch.id === 'network-stack') {
-        edges.push({
-          id: 'branch-network-top-stem',
-          source: 'network-top-anchor',
+          id: `branch-${branch.id}-top-stem`,
+          source: `${branch.id}-top-anchor`,
           target: branchDotId,
           type: 'straight',
           animated: false,
@@ -301,10 +268,10 @@ function HomePage() {
                 About
               </span>
               <h2 className="mt-4 font-serif text-3xl font-semibold tracking-[-0.04em] text-stone-900">
-                涓汉浠嬬粛
+                个人介绍
               </h2>
               <p className="mt-4 text-stone-600">
-                鎴戝叧娉ㄤ唬鐮併€佷骇鍝併€佸熀纭€璁炬柦鍜屼簰鑱旂綉涓婇偅浜涙湁鎰忔€濈殑灏忎笢瑗裤€傝繖涓珯鐐逛細鐢ㄦ渶鐩存帴鐨勬柟寮忎粙缁嶆垜鏄皝锛屼互鍙婃垜鍦ㄥ仛浠€涔堛€?
+                我关注代码、产品、基础设施和互联网上那些有意思的小东西。这个站点会用最直接的方式介绍我是谁，以及我在做什么。
               </p>
             </article>
 
@@ -313,7 +280,7 @@ function HomePage() {
                 Contact
               </span>
               <h2 className="mt-4 font-serif text-3xl font-semibold tracking-[-0.04em] text-stone-900">
-                鑱旂郴鎴?
+                联系我
               </h2>
               <ul className="mt-6 grid gap-4">
                 {links.map((link) => (
@@ -348,9 +315,9 @@ function HomePage() {
                 <span className="h-2 w-2 rounded-full bg-orange-600" />
                 Main
               </span>
-              {graphBranches.map((branch) => (
+              {graphBranchEntries.map(([branchId, branch]) => (
                 <span
-                  key={branch.id}
+                  key={branchId}
                   className="inline-flex items-center gap-2 rounded-full bg-stone-100 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-stone-700"
                 >
                   <span className="h-2 w-2 rounded-full" style={{ backgroundColor: branch.color }} />
@@ -361,7 +328,7 @@ function HomePage() {
           </div>
 
           <div className="overflow-hidden rounded-[1.5rem] border border-stone-900/10 bg-[linear-gradient(180deg,rgba(255,252,249,0.96),rgba(255,255,255,0.84))]">
-            <div className="grid grid-cols-[240px_minmax(0,1fr)]">
+            <div className="grid grid-cols-[320px_minmax(0,1fr)]">
               <div className="relative border-r border-stone-900/8 bg-[radial-gradient(circle_at_top,rgba(210,92,52,0.06),transparent_18rem)]">
                 <ReactFlowProvider>
                   <div style={{ height: `${flowHeight}px`, width: `${FLOW_WIDTH}px` }}>

@@ -2,6 +2,14 @@ import type { Tag } from './tagicon'
 
 export type TimelinePoint = [year: number, month: number, day: number]
 
+export const graphBranches = {
+    tju: { label: 'TJU', color: '#2563eb', offset: 50, topAnchorX: 50 },
+    nyu: { label: 'NYU', color: '#7c3aed', offset: 80, topAnchorX: 80 },
+    'network-stack': { label: 'Net Stack', color: '#0ea5e9', offset: 110, topAnchorX: 110 },
+} as const
+
+export type GraphBranchId = keyof typeof graphBranches
+
 export type TimelineDate =
     | TimelinePoint
     | {
@@ -17,7 +25,7 @@ export type TimelineItem = {
     kind: 'career' | 'demo' | 'project' | 'product' | 'solution' | 'trial'
     status?: 'archive' | 'active'
     url?: string
-    branches?: string[]
+    branches?: GraphBranchId[]
 }
 
 export const timeline: TimelineItem[] = [
@@ -27,7 +35,7 @@ export const timeline: TimelineItem[] = [
         text: '进入天津大学智能制造专业开始本科学习。',
         tags: ['tju', 'smart-manufacturing', 'education', 'enrollment'],
         kind: 'career',
-        branches: ['education'],
+        branches: ['tju'],
     },
     {
         date: [2022, 5, 30],
@@ -35,7 +43,7 @@ export const timeline: TimelineItem[] = [
         text: '转入天津大学智能与计算学部人工智能专业继续本科学习。',
         tags: ['tju', 'ai', 'major-transfer', 'education'],
         kind: 'career',
-        branches: ['education'],
+        branches: ['tju'],
     },
     {
         date: {
@@ -46,7 +54,7 @@ export const timeline: TimelineItem[] = [
         text: '在天津大学算法社参与将 HOJ 修改为 TJUOJ 的工作，负责前端开发。',
         tags: ['tju', 'algorithm-club', 'frontend', 'oj'],
         kind: 'career',
-        branches: ['education'],
+        branches: ['tju'],
     },
     {
         date: {
@@ -75,7 +83,7 @@ export const timeline: TimelineItem[] = [
         text: '最后一次 TOEFL 成绩为阅读 27、听力 21、口语 22、写作 25。历史最高单项分别为阅读 29、听力 27、口语 25、写作 25。',
         tags: ['toefl', 'english', 'exam', 'score'],
         kind: 'career',
-        branches: ['education'],
+        branches: ['tju'],
     },
     {
         date: [2024, 9, 28],
@@ -131,7 +139,6 @@ export const timeline: TimelineItem[] = [
         tags: ['rust', 'compiler', 'lox', 'crafting-interpreters'],
         kind: 'solution',
         url: 'https://gitee.com/jabberwocky238/lox',
-        branches: ['compiler-construction'],
     },
     {
         date: [2025, 1, 21],
@@ -156,7 +163,7 @@ export const timeline: TimelineItem[] = [
         text: '收到 NYU Tandon 的录取结果。',
         tags: ['nyu', 'tandon', 'admission', 'education'],
         kind: 'career',
-        branches: ['education'],
+        branches: ['nyu'],
     },
     {
         date: [2025, 3, 14],
@@ -164,7 +171,7 @@ export const timeline: TimelineItem[] = [
         text: '参与学生发起的小程序开发项目 Infinite Galaxy，负责前端、后端以及数据库管理工作。',
         tags: ['mini-program', 'frontend', 'backend', 'database', 'teamwork'],
         kind: 'project',
-        branches: ['education'],
+        branches: ['tju'],
     },
     {
         date: {
@@ -183,7 +190,7 @@ export const timeline: TimelineItem[] = [
         text: '于天津大学人工智能专业完成本科学业并毕业。',
         tags: ['tju', 'ai', 'graduation', 'education'],
         kind: 'career',
-        branches: ['education'],
+        branches: ['tju'],
     },
     {
         date: [2025, 6, 26],
@@ -209,7 +216,7 @@ export const timeline: TimelineItem[] = [
         text: '创立 enzyme.cloud，提供 SOCKS5 VPN 代理服务。',
         tags: ['socks5', 'vpn', 'proxy', 'service'],
         kind: 'product',
-        branches: ['network-stack', 'entrepreneurship'],
+        branches: ['network-stack'],
     },
     {
         date: [2025, 8, 24],
@@ -217,7 +224,7 @@ export const timeline: TimelineItem[] = [
         text: '正式入学 NYU Tandon，开始新的学习阶段。',
         tags: ['nyu', 'tandon', 'enrollment', 'education'],
         kind: 'career',
-        branches: ['education'],
+        branches: ['nyu'],
     },
     {
         date: [2025, 9, 11],
@@ -234,7 +241,6 @@ export const timeline: TimelineItem[] = [
         text: '加入纽约学生创业组织 K&M ERA，担任 CTO，负责 Solana 合约开发。',
         tags: ['cto', 'solana', 'smart-contract', 'startup', 'nyc'],
         kind: 'career',
-        branches: ['entrepreneurship'],
     },
     {
         date: [2025, 9, 17],
@@ -289,16 +295,6 @@ export const timeline: TimelineItem[] = [
         tags: ['golang', 'sql', 'kv', 'message-queue', 'object-storage'],
         kind: 'project',
         status: 'archive',
-        branches: ['combinator'],
-    },
-    {
-        date: [2026, 1, 18],
-        title: 'combinator-action',
-        text: '开发 combinator-action，让用户可以通过 GitHub Actions 集成对 combinator 的 upsert。',
-        tags: ['github-actions', 'combinator', 'upsert', 'automation'],
-        kind: 'solution',
-        url: 'https://github.com/Jabberwocky238/combinator-action',
-        branches: ['combinator'],
     },
     {
         date: [2026, 1, 22],
@@ -315,7 +311,6 @@ export const timeline: TimelineItem[] = [
         tags: ['go', 'sqlparser', 'sqlite', 'postgresql', 'parser'],
         kind: 'solution',
         url: 'https://github.com/Jabberwocky238/sqlparser',
-        branches: ['combinator'],
     },
     {
         date: [2026, 2, 11],
@@ -324,7 +319,6 @@ export const timeline: TimelineItem[] = [
         tags: ['combinator', 'edge-computing', 'experiment', 'demo'],
         kind: 'trial',
         url: 'https://github.com/Jabberwocky238/exhibitor',
-        branches: ['combinator'],
     },
     {
         date: [2026, 2, 12],
@@ -360,7 +354,6 @@ export const timeline: TimelineItem[] = [
         kind: 'trial',
         status: 'archive',
         url: 'https://github.com/Jabberwocky238/fs3',
-        branches: ['cloud-native', 'agent-programming'],
     },
     {
         date: [2026, 3, 21],
