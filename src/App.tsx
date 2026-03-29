@@ -1,15 +1,11 @@
-import type { CSSProperties, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import {
   Background,
-  Handle,
   MarkerType,
-  Position,
   ReactFlow,
   ReactFlowProvider,
   type Edge,
   type Node,
-  type NodeProps,
-  type NodeTypes,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { HashRouter, Route, Routes } from 'react-router-dom'
@@ -28,19 +24,6 @@ type GraphBranch = {
   label: string
   color: string
   match: (item: TimelineItem) => boolean
-}
-
-type TimelineCardData = {
-  item: TimelineItem
-  dateLabel: string
-  branches: GraphBranch[]
-}
-
-type DotNodeData = {
-  color: string
-  size?: 'sm' | 'lg'
-  glow?: boolean
-  ring?: boolean
 }
 
 const links: LinkItem[] = [
@@ -104,28 +87,17 @@ const graphBranches: GraphBranch[] = [
     match: (item) => item.tags.includes('nyu'),
   },
   {
-    id: 'kmera',
-    label: 'K&M ERA',
-    color: '#db2777',
-    match: (item) => item.title.includes('K&M ERA'),
-  },
-  {
-    id: 'combinator',
-    label: 'Combinator',
+    id: 'network-stack',
+    label: 'Net Stack',
     color: '#0ea5e9',
-    match: (item) =>
-      item.title.toLowerCase().includes('combinator') ||
-      item.text.toLowerCase().includes('combinator') ||
-      item.tags.includes('combinator'),
+    match: (item) => item.branches?.includes('network-stack') ?? false,
   },
 ]
 
-const CARD_X = 232
-const MAIN_X = 84
-const BRANCH_X_START = 128
-const BRANCH_X_GAP = 26
-const ROW_HEIGHT = 220
-const TOP_PADDING = 32
+const MAIN_X = 20
+const ROW_HEIGHT = 248
+const DOT_OFFSET_Y = 117
+const FLOW_WIDTH = 240
 
 function formatPoint([year, month, day]: TimelinePoint) {
   return `${year} / ${String(month).padStart(2, '0')} / ${String(day).padStart(2, '0')}`
@@ -146,138 +118,78 @@ function getTimelineSortValue(date: TimelineDate) {
   return year * 10000 + month * 100 + day
 }
 
-function TimelineCardNode({ data }: NodeProps<Node<TimelineCardData>>) {
-  const item = data.item
-
-  return (
-    <div className="w-[700px] rounded-[1.35rem] border border-stone-900/10 bg-white/88 p-5 shadow-[0_18px_40px_rgba(81,52,35,0.08)] backdrop-blur">
-      <Handle type="target" position={Position.Left} className="!h-3 !w-3 !border-2 !border-white !bg-orange-600" />
-      <Handle type="source" position={Position.Left} id="branch-in" className="!h-3 !w-3 !border-2 !border-white !bg-stone-300" />
-
-      <p className="mb-2 font-mono text-xs uppercase tracking-[0.28em] text-stone-500">
-        {data.dateLabel}
-      </p>
-      <div className="mb-3 flex flex-wrap gap-2">
-        <span className="rounded-full bg-orange-100 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-orange-700">
-          {item.kind}
-        </span>
-        {item.status ? (
-          <span className="rounded-full bg-stone-100 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-stone-600">
-            {item.status}
-          </span>
-        ) : null}
-        {data.branches.map((branch) => (
-          <span
-            key={branch.id}
-            className="inline-flex items-center gap-2 rounded-full bg-stone-100 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-stone-600"
-          >
-            <span className="h-2 w-2 rounded-full" style={{ backgroundColor: branch.color }} />
-            {branch.label}
-          </span>
-        ))}
-      </div>
-      <h3 className="text-xl font-semibold text-stone-900">{item.title}</h3>
-      <p className="mt-2 text-stone-600">{item.text}</p>
-      {item.url ? (
-        <p className="mt-3">
-          <a
-            className="text-sm text-orange-700 underline decoration-orange-300 underline-offset-4 transition hover:text-orange-800"
-            href={item.url}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Open Link
-          </a>
-        </p>
-      ) : null}
-      <ul className="mt-4 flex flex-wrap gap-2">
-        {item.tags.map((tag) => {
-          const meta = getTagMeta(tag)
-
-          return (
-            <li
-              className="inline-flex items-center gap-2 rounded-full border border-stone-900/10 px-3 py-1 text-sm text-stone-700"
-              key={tag}
-            >
-              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-stone-900/5 text-stone-700">
-                {meta.icon}
-              </span>
-              <span>{meta.label}</span>
-            </li>
-          )
-        })}
-      </ul>
-    </div>
-  )
-}
-
-function DotNode({ data }: NodeProps<Node<DotNodeData>>) {
-  const sizeClass = data.size === 'lg' ? 'h-5 w-5' : 'h-3.5 w-3.5'
-  const ringStyle: CSSProperties | undefined = data.ring
-    ? { boxShadow: `0 0 0 5px ${data.color}22` }
-    : undefined
-
-  return (
-    <div
-      className={`rounded-full border-2 border-white ${sizeClass}`}
-      style={{
-        backgroundColor: data.color,
-        ...(data.glow ? { boxShadow: `0 0 0 8px ${data.color}20` } : {}),
-        ...ringStyle,
-      }}
-    >
-      <Handle type="target" position={Position.Top} className="!opacity-0" />
-      <Handle type="source" position={Position.Bottom} className="!opacity-0" />
-      <Handle type="source" position={Position.Right} id="card" className="!opacity-0" />
-    </div>
-  )
-}
-
-const nodeTypes: NodeTypes = {
-  timelineCard: TimelineCardNode,
-  dot: DotNode,
-}
-
 function buildTimelineFlow(timelineItems: TimelineItem[]) {
   const branchMembership = timelineItems.map((item) =>
     graphBranches.filter((branch) => branch.match(item))
   )
+  const branchOffsets: Record<string, number> = {
+    tju: 50,
+    nyu: 80,
+    'network-stack': 110,
+  }
 
-  const nodes: Array<Node<TimelineCardData | DotNodeData>> = []
+  const nodes: Node[] = []
   const edges: Edge[] = []
   const previousBranchDots = new Map<string, string>()
   let previousMainDot: string | null = null
 
-  timelineItems.forEach((item, index) => {
-    const y = TOP_PADDING + index * ROW_HEIGHT
-    const cardId = `card-${index}`
-    const mainDotId = `main-${index}`
-    const branches = branchMembership[index]
+  edges.push({
+    id: 'main-top-stem',
+    source: 'main-top-anchor',
+    target: 'main-0',
+    type: 'straight',
+    animated: false,
+    style: { stroke: '#d25c34', strokeWidth: 3 },
+  })
 
-    nodes.push({
-      id: cardId,
-      type: 'timelineCard',
-      position: { x: CARD_X, y },
-      draggable: false,
-      selectable: false,
-      data: {
-        item,
-        dateLabel: formatTimelineDate(item.date),
-        branches,
-      },
-    })
+  nodes.push({
+    id: 'main-top-anchor',
+    position: { x: MAIN_X, y: 0 },
+    draggable: false,
+    selectable: false,
+    data: {},
+    style: { width: 1, height: 1, opacity: 0, pointerEvents: 'none' },
+  })
+  nodes.push({
+    id: 'nyu-top-anchor',
+    position: { x: 48, y: 0 },
+    draggable: false,
+    selectable: false,
+    data: {},
+    style: { width: 1, height: 1, opacity: 0, pointerEvents: 'none' },
+  })
+  nodes.push({
+    id: 'network-top-anchor',
+    position: { x: 56, y: 0 },
+    draggable: false,
+    selectable: false,
+    data: {},
+    style: { width: 1, height: 1, opacity: 0, pointerEvents: 'none' },
+  })
+
+  timelineItems.forEach((_, index) => {
+    const branches = branchMembership[index]
+    const y = index * ROW_HEIGHT
+    const mainDotId = `main-${index}`
 
     nodes.push({
       id: mainDotId,
-      type: 'dot',
-      position: { x: MAIN_X, y: y + 18 },
+      position: { x: MAIN_X, y: y + DOT_OFFSET_Y },
       draggable: false,
       selectable: false,
-      data: {
-        color: '#d25c34',
-        glow: index === 0,
-        ring: index === timelineItems.length - 1,
-        size: index === 0 ? 'lg' : 'sm',
+      data: {},
+      style: {
+        width: index === 0 ? 18 : 14,
+        height: index === 0 ? 18 : 14,
+        borderRadius: 999,
+        border: '2px solid white',
+        background: '#d25c34',
+        boxShadow:
+          index === 0
+            ? '0 0 0 8px rgba(210,92,52,0.15)'
+            : index === timelineItems.length - 1
+              ? '0 0 0 5px rgba(210,92,52,0.13)'
+              : 'none',
       },
     })
 
@@ -292,29 +204,22 @@ function buildTimelineFlow(timelineItems: TimelineItem[]) {
       })
     }
 
-    edges.push({
-      id: `main-card-${index}`,
-      source: mainDotId,
-      sourceHandle: 'card',
-      target: cardId,
-      type: 'smoothstep',
-      animated: false,
-      style: { stroke: '#b9b2aa', strokeWidth: 2 },
-    })
-
     branches.forEach((branch, branchIndex) => {
       const branchDotId = `branch-${branch.id}-${index}`
-      const x = BRANCH_X_START + branchIndex * BRANCH_X_GAP
+      const x = branchOffsets[branch.id]
 
       nodes.push({
         id: branchDotId,
-        type: 'dot',
-        position: { x, y: y + 20 },
+        position: { x, y: y + DOT_OFFSET_Y + branchIndex * 2 },
         draggable: false,
         selectable: false,
-        data: {
-          color: branch.color,
-          size: 'sm',
+        data: {},
+        style: {
+          width: 12,
+          height: 12,
+          borderRadius: 999,
+          border: '2px solid white',
+          background: branch.color,
         },
       })
 
@@ -334,17 +239,33 @@ function buildTimelineFlow(timelineItems: TimelineItem[]) {
             height: 18,
           },
         })
+      } else if (branch.id === 'nyu') {
+        edges.push({
+          id: 'branch-nyu-top-stem',
+          source: 'nyu-top-anchor',
+          target: branchDotId,
+          type: 'straight',
+          animated: false,
+          style: { stroke: branch.color, strokeWidth: 3 },
+        })
+      } else if (branch.id === 'network-stack') {
+        edges.push({
+          id: 'branch-network-top-stem',
+          source: 'network-top-anchor',
+          target: branchDotId,
+          type: 'straight',
+          animated: false,
+          style: { stroke: branch.color, strokeWidth: 3 },
+        })
       }
 
       edges.push({
-        id: `branch-card-${branch.id}-${index}`,
+        id: `branch-main-${branch.id}-${index}`,
         source: branchDotId,
-        sourceHandle: 'card',
-        target: cardId,
-        targetHandle: 'branch-in',
+        target: mainDotId,
         type: 'smoothstep',
         animated: false,
-        style: { stroke: branch.color, strokeWidth: 2.5, strokeDasharray: '5 5' },
+        style: { stroke: branch.color, strokeWidth: 2, strokeDasharray: '5 5', opacity: 0.9 },
       })
 
       previousBranchDots.set(branch.id, branchDotId)
@@ -353,9 +274,9 @@ function buildTimelineFlow(timelineItems: TimelineItem[]) {
     previousMainDot = mainDotId
   })
 
-  const flowHeight = TOP_PADDING * 2 + Math.max(timelineItems.length * ROW_HEIGHT, 560)
+  const flowHeight = Math.max(timelineItems.length * ROW_HEIGHT, 560)
 
-  return { nodes, edges, flowHeight }
+  return { nodes, edges, flowHeight, branchMembership }
 }
 
 function HomePage() {
@@ -363,7 +284,7 @@ function HomePage() {
     (a, b) => getTimelineSortValue(b.date) - getTimelineSortValue(a.date)
   )
 
-  const { nodes, edges, flowHeight } = buildTimelineFlow(timelineItems)
+  const { nodes, edges, flowHeight, branchMembership } = buildTimelineFlow(timelineItems)
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-6xl px-4 py-4 sm:px-6 sm:py-8">
@@ -440,32 +361,125 @@ function HomePage() {
           </div>
 
           <div className="overflow-hidden rounded-[1.5rem] border border-stone-900/10 bg-[linear-gradient(180deg,rgba(255,252,249,0.96),rgba(255,255,255,0.84))]">
-            <ReactFlowProvider>
-              <div style={{ height: `${flowHeight}px` }}>
-                <ReactFlow
-                  nodes={nodes}
-                  edges={edges}
-                  nodeTypes={nodeTypes}
-                  fitView
-                  fitViewOptions={{ padding: 0.08, minZoom: 0.72 }}
-                  minZoom={0.55}
-                  maxZoom={1.2}
-                  panOnDrag={false}
-                  panOnScroll={false}
-                  zoomOnScroll={false}
-                  zoomOnPinch={false}
-                  zoomOnDoubleClick={false}
-                  nodesDraggable={false}
-                  nodesConnectable={false}
-                  elementsSelectable={false}
-                  preventScrolling={false}
-                  colorMode="light"
-                  className="bg-transparent"
-                >
-                  <Background gap={28} size={1} color="#e7ded4" />
-                </ReactFlow>
+            <div className="grid grid-cols-[240px_minmax(0,1fr)]">
+              <div className="relative border-r border-stone-900/8 bg-[radial-gradient(circle_at_top,rgba(210,92,52,0.06),transparent_18rem)]">
+                <ReactFlowProvider>
+                  <div style={{ height: `${flowHeight}px`, width: `${FLOW_WIDTH}px` }}>
+                    <ReactFlow
+                      nodes={nodes}
+                      edges={edges}
+                      fitView={false}
+                      defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+                      minZoom={1}
+                      maxZoom={1}
+                      panOnDrag={false}
+                      panOnScroll={false}
+                      zoomOnScroll={false}
+                      zoomOnPinch={false}
+                      zoomOnDoubleClick={false}
+                      nodesDraggable={false}
+                      nodesConnectable={false}
+                      elementsSelectable={false}
+                      preventScrolling={false}
+                      proOptions={{ hideAttribution: true }}
+                      colorMode="light"
+                      className="bg-transparent"
+                    >
+                      <Background gap={28} size={1} color="#e7ded4" />
+                    </ReactFlow>
+                  </div>
+                </ReactFlowProvider>
               </div>
-            </ReactFlowProvider>
+
+              <div className="divide-y divide-stone-900/6">
+                {timelineItems.map((item, index) => {
+                  const activeBranches = branchMembership[index]
+
+                  return (
+                    <article
+                      key={`${index}-${item.title}`}
+                      className="flex h-[248px] items-center overflow-hidden px-5 py-0"
+                    >
+                      <div className="grid h-[208px] w-full min-w-0 grid-rows-[auto_auto_1fr] overflow-hidden rounded-[1.25rem] border border-stone-900/10 bg-white/82 px-5 py-4 shadow-[0_14px_32px_rgba(81,52,35,0.06)]">
+                        <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
+                          <h3
+                            className="min-h-0 overflow-hidden text-xl leading-7 font-semibold text-stone-900"
+                            style={{
+                              display: '-webkit-box',
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: 'vertical',
+                            }}
+                          >
+                            {item.title}
+                          </h3>
+                          <p className="pt-1 text-right font-mono text-xs uppercase tracking-[0.28em] text-stone-500">
+                            {formatTimelineDate(item.date)}
+                          </p>
+                        </div>
+
+                        <div className="mb-3 flex max-h-[60px] flex-wrap content-start gap-2 overflow-hidden">
+                          <span className="rounded-full bg-orange-100 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-orange-700">
+                            {item.kind}
+                          </span>
+                          {item.status ? (
+                            <span className="rounded-full bg-stone-100 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-stone-600">
+                              {item.status}
+                            </span>
+                          ) : null}
+                          {activeBranches.map((branch) => (
+                            <span
+                              key={branch.id}
+                              className="inline-flex items-center gap-2 rounded-full bg-stone-100 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-stone-600"
+                            >
+                              <span
+                                className="h-2 w-2 rounded-full"
+                                style={{ backgroundColor: branch.color }}
+                              />
+                              {branch.label}
+                            </span>
+                          ))}
+                          {item.url ? (
+                            <a
+                              className="inline-flex items-center rounded-full bg-stone-100 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-orange-700 underline decoration-orange-300 underline-offset-4 transition hover:text-orange-800"
+                              href={item.url}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Link
+                            </a>
+                          ) : null}
+                          {item.tags.slice(0, 5).map((tag) => {
+                            const meta = getTagMeta(tag)
+
+                            return (
+                              <span
+                                className="inline-flex items-center gap-2 rounded-full border border-stone-900/10 px-3 py-1 text-sm text-stone-700"
+                                key={tag}
+                              >
+                                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-stone-900/5 text-stone-700">
+                                  {meta.icon}
+                                </span>
+                                <span>{meta.label}</span>
+                              </span>
+                            )
+                          })}
+                        </div>
+                        <p
+                          className="min-h-0 overflow-hidden leading-6 text-stone-600"
+                          style={{
+                            display: '-webkit-box',
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: 'vertical',
+                          }}
+                        >
+                          {item.text}
+                        </p>
+                      </div>
+                    </article>
+                  )
+                })}
+              </div>
+            </div>
           </div>
         </section>
       </div>
